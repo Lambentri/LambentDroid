@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">LambentDroid</string>
+    <string name="app_desc">Welcome! Please enter the information for your LabmentAether instance</string>
+    <string name="app_connect">Connect</string>
+
+    <string name="connection_host">Host</string>
+    <string name="connection_port">Port</string>
+    <string name="connection_realm">Realm</string>
+
+</resources>
