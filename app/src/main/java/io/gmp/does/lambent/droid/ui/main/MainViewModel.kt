@@ -57,16 +57,15 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
         callbacks.notifyCallbacks(this, fieldId, null)
     }
 
-    //
     init {
         host_name.set(shared_prefs.getString("host_name", "192.168.1.1"))
         host_port.set(shared_prefs.getString("host_port", "8083"));
         host_realm.set(shared_prefs.getString("host_realm", "realm1"));
         notifyChange()
 
-        session.addOnJoinListener(::add_subscriptions)
+//        session.addOnJoinListener(::add_subscriptions)
         session.addOnJoinListener(::onJoin)
-        session.addOnLeaveListener(::onDc)
+//        session.addOnLeaveListener(::onDc)
     }
 
     fun link_listener(args: List<Any>, kwargs: Map<String, Any>, details: EventDetails) {
@@ -109,15 +108,15 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
 
     fun setPrefs() {
         val editor = shared_prefs.edit()
-        editor.putString("host_name", host_name.get())
-        editor.putString("host_port", host_port.get())
-        editor.putString("host_realm", host_realm.get())
-        editor.commit()
+        editor.putString("host_name", host_name.get()!!.trim())
+        editor.putString("host_port", host_port.get()!!.trim())
+        editor.putString("host_realm", host_realm.get()!!.trim())
+        editor.apply()
     }
 
 
     private fun start() {
-        var hostname: String = host_name.get()!!
+        var hostname: String = host_name.get()!!.trim()
         if (!hostname.startsWith("ws://") && !hostname.startsWith("wss://")) {
             hostname = "ws://$hostname"
         }
@@ -130,15 +129,16 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
         }
         log { hostname }
 
+        connection_status.set("Status: Connecting to $wsuri ..")
 
         val client = Client(session, hostname, host_realm.get())
         val exitInfoCompletableFuture: CompletableFuture<ExitInfo> = client.connect()
 
 
-        connection_status.set("Status: Connecting to $wsuri ..")
+
 //        setButtonDisconnect()
-        val connectOptions = WebSocketOptions()
-        connectOptions.reconnectInterval = 5000
+//        val connectOptions = WebSocketOptions()
+//        connectOptions.reconnectInterval = 5000
 
     }
 
