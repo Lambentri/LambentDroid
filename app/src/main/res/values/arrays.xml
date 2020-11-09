@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="brightness_slider_values">
+        <item value="0">Off</item>
+        <item value="1">5%</item>
+        <item value="2">10%</item>
+        <item value="3">25%</item>
+        <item value="4">50%</item>
+        <item value="5">100%</item>
+    </string-array>
+</resources>
