@@ -24,10 +24,9 @@
                 android:id="@+id/info_message"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="300dp"
                 android:paddingHorizontal="24dp"
                 android:text="@string/app_desc"
-                android:textSize="20sp"
+                android:textSize="27sp"
                 app:layout_constraintBottom_toTopOf="@id/connection_form"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -102,7 +101,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                app:layout_constraintBottom_toTopOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/connected_controls"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/connection_form">
@@ -129,6 +128,18 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@{viewModel.connection_status}" />
+
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/connected_controls"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/connection_button_holder"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:orientation="vertical"
+                android:visibility="@{viewModel.connected_viz}">
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -148,22 +159,16 @@
                         />
                 </LinearLayout>
 
+                <com.google.android.material.tabs.TabLayout
+                    android:id="@+id/tab_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
 
-
-<!--                    <com.google.android.material.tabs.TabLayout-->
-<!--                        android:id="@+id/tab_layout"-->
-<!--                        android:layout_width="match_parent"-->
-<!--                        android:layout_height="wrap_content" />-->
-
-<!--                    <androidx.viewpager2.widget.ViewPager2-->
-<!--                        android:id="@+id/tab_pager"-->
-<!--                        android:layout_width="match_parent"-->
-<!--                        android:layout_height="0dp"-->
-<!--                        android:layout_weight="1" />-->
-
-
-
-
+                <androidx.viewpager2.widget.ViewPager2
+                    android:id="@+id/tab_pager"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
             </LinearLayout>
 
 

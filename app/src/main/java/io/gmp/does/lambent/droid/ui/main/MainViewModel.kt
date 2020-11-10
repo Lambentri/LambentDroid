@@ -5,6 +5,7 @@ import android.content.Context
 import android.view.View
 import android.widget.AdapterView
 import androidx.databinding.Observable
+import androidx.databinding.ObservableArrayMap
 import androidx.databinding.ObservableField
 import androidx.databinding.PropertyChangeRegistry
 import androidx.lifecycle.AndroidViewModel
@@ -12,7 +13,7 @@ import io.crossbar.autobahn.wamp.Client
 import io.crossbar.autobahn.wamp.Session
 import io.crossbar.autobahn.wamp.types.*
 import io.crossbar.autobahn.websocket.types.WebSocketOptions
-import io.gmp.does.lambent.droid.log
+import io.gmp.does.lambent.droid.*
 import java.util.concurrent.CompletableFuture
 
 val POSITION_TO_BRIGHTNESS = mapOf(
@@ -39,6 +40,8 @@ val TEXT_DISCONNECT = "Disconnect"
 data class BrightnessValue(
     var brightness: Int
 )
+
+
 open class MainViewModel(application: Application) : AndroidViewModel(application), Observable {
     // TODO: Implement the ViewModel
     val TAG: String = "io.gmp.does.droid.main"
@@ -46,10 +49,11 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
     val shared_prefs =
         getApplication<Application>().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
-//    lateinit var brightness_slider: Slider
+    //    lateinit var brightness_slider: Slider
     var connecting: Boolean = false;
 
     var connecting_viz = ObservableField<Int>()
+    val connected_viz = ObservableField<Int>()
     var connectionText = ObservableField<String>()
 
     var session = Session()
@@ -62,7 +66,14 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
 
     val connection_status = ObservableField<String>()
 
+    // storage of live data
     var brightnessSelectedPosition: Int = 0
+
+    var list_links: MutableMap<String, Link> = ObservableArrayMap<String, Link>()
+    var list_srcs: MutableMap<String, LinkSrc> = ObservableArrayMap<String, LinkSrc>()
+    var list_sinks: MutableMap<String, LinkSink> = ObservableArrayMap<String, LinkSink>()
+    var list_machines: MutableMap<String, Machine> = ObservableArrayMap<String, Machine>()
+    var list_devices: MutableMap<String, Device> = ObservableArrayMap<String, Device>()
 
     private val callbacks: PropertyChangeRegistry by lazy { PropertyChangeRegistry() }
 
@@ -94,19 +105,50 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
         session.addOnLeaveListener(::onDc)
 
         connecting_viz.set(View.VISIBLE)
+        connected_viz.set(View.GONE)
         connectionText.set(TEXT_CONNECT)
 
 
     }
 
     fun link_listener(args: List<Any>, kwargs: Map<String, Any>, details: EventDetails) {
-//        log { "Got Event" }
-//        log { kwargs.toString() }
-//        log { details.toString() }
+        log { "Got Link Update" }
+        log { kwargs.toString() }
+        log { details.toString() }
+
+        val links = kwargs.get("links") as Map<String, Map<String, Any>>
+        val sinks = kwargs.get("sinks") as List<Map<String, String>>
+        val srcs = kwargs.get("srcs") as List<Map<String, String>>
+        for ((key: String, entry: Map<String, Any>) in links) {
+            list_links[key] = Link.fromNetwork(entry)
+        }
+        for (entry in sinks) {
+            val s = LinkSink.fromNetwork(entry)
+            list_sinks[s.id] = s
+        }
+
+        for (entry in srcs) {
+            val s = LinkSrc.fromNetwork(entry)
+            list_srcs[s.id] = s
+        }
+        log { list_links.toString() }
+        log { list_sinks.toString() }
+        log { list_srcs.toString() }
+
     }
 
     fun device_listener(args: List<Any>, kwargs: Map<String, Any>, details: EventDetails) {
+//        log { "Got Device Update" }
+//        log { kwargs.toString() }
+//        log { details.toString() }
 
+        val entries: ArrayList<Map<String, String>> =
+            kwargs.get("res") as ArrayList<Map<String, String>>
+        for (entry in entries) {
+            val d = Device.fromNetwork(entry)
+            list_devices[d.id] = d
+        }
+        log { list_devices.toString() }
     }
 
     fun add_subscriptions(session: Session, details: SessionDetails) {
@@ -126,7 +168,7 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
         })
 
         val subDevicesFuture: CompletableFuture<Subscription> = session.subscribe(
-            "com.lambentri.edge.la4.links",
+            "com.lambentri.edge.la4.machine.sink.8266-7777", // TODO generic device governor
             ::device_listener
         )
         subDevicesFuture.whenComplete({ subscription, throwable ->
@@ -139,6 +181,7 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
                 throwable.printStackTrace()
             }
         })
+
     }
 
     fun onJoin(session: Session, details: SessionDetails) {
@@ -146,11 +189,12 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
         connection_status.set("Status: Connected to $curr_hostname")
         log { "joined" }
         connecting_viz.set(View.GONE)
+        connected_viz.set(View.VISIBLE)
         connectionText.set(TEXT_DISCONNECT)
 
         session.call("com.lambentri.edge.la4.machine.gb.get").thenAccept {
-            log{it.results.get(0).toString()}
-            val pos = (it.results.get(0) as Map<String,Int>).get("brightness")
+            log { it.results.get(0).toString() }
+            val pos = (it.results.get(0) as Map<String, Int>).get("brightness")
             log { pos.toString() }
             brightnessSelectedPosition = BRIGHTNESS_TO_POSITION[pos!!]!!
             notifyChange()
@@ -161,6 +205,7 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
         connection_status.set("Status: Ready to Connect")
         log { "dcd" }
         connecting_viz.set(View.VISIBLE)
+        connected_viz.set(View.GONE)
         connectionText.set(TEXT_CONNECT)
     }
 
@@ -173,7 +218,7 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
             notifyChange()
             start()
         } else {
-            log {"Disconnect pressed"}
+            log { "Disconnect pressed" }
             connecting = false
             session.leave()
             notifyChange()
@@ -198,8 +243,11 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
             val currentItem = parent!!.getItemAtPosition(position) as String
             if (currentItem != null) {
                 log { currentItem.toString() }
-                if(session.isConnected()) {
-                    session.call("com.lambentri.edge.la4.machine.gb.set", POSITION_TO_BRIGHTNESS[position])
+                if (session.isConnected()) {
+                    session.call(
+                        "com.lambentri.edge.la4.machine.gb.set",
+                        POSITION_TO_BRIGHTNESS[position]
+                    )
                 }
             }
         }
