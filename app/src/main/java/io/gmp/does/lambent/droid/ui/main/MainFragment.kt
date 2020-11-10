@@ -8,12 +8,16 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.databinding.DataBindingUtil
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import io.gmp.does.lambent.droid.DeviceListAdapter
 import io.gmp.does.lambent.droid.MainBinding
 import io.gmp.does.lambent.droid.R
+import io.gmp.does.lambent.droid.SubBindingDevices
+import kotlinx.android.synthetic.main.fragment_tab_devices.*
 
 val Labels = listOf<String>(
     "Devices",
@@ -28,17 +32,24 @@ private const val ARG_OBJECT = "object"
 class DemoCollectionAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
 
     override fun getItemCount(): Int = Labels.size
+//    lateinit var fragment: Fragment
 
-    override fun createFragment(position: Int): Fragment {
+    override fun createFragment(position: Int): Fragment =
         // Return a NEW fragment instance in createFragment(int)
-        val fragment = DemoObjectFragment()
-        fragment.arguments = Bundle().apply {
-            // Our object is just an integer :-P
-            putInt(ARG_ID, position)
-            putString(ARG_OBJECT, Labels[position])
-        }
-        return fragment
-    }
+        when (position) {
+            0 ->  DeviceListFragment()
+            1 ->  DeviceListFragment()
+            else -> DemoObjectFragment()
+            }
+
+
+//        fragment.arguments = Bundle().apply {
+//            // Our object is just an integer :-P
+//            putInt(ARG_ID, position)
+//            putString(ARG_OBJECT, Labels[position])
+//        }
+//        return fragment
+
 }
 
 
@@ -56,7 +67,6 @@ class MainFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
-//        return inflater.inflate(R.layout.main_fragment, container, false)
         val binding = DataBindingUtil.inflate<MainBinding>(inflater, R.layout.main_fragment, container, false)
         val viewModel = ViewModelProviders.of(this).get(MainViewModel::class.java)
         val view: View = binding.root
@@ -86,9 +96,32 @@ class MainFragment : Fragment() {
 
 }
 
+class DeviceListFragment : Fragment() {
 
-// Instances of this class are fragments representing a single
-// object in our collection.
+    lateinit var viewModel: MainViewModel
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        val binding = DataBindingUtil.inflate<SubBindingDevices>(inflater, R.layout.fragment_tab_devices, container, false)
+        viewModel = ViewModelProviders.of(this).get(MainViewModel::class.java)
+        val view: View = binding.root
+        binding.setLifecycleOwner(this)
+        binding.viewModel = viewModel
+        return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        val device_list_adapter = DeviceListAdapter()
+//        device_list_adapter.setPlaces(viewModel.list_devices.values.toList())
+        device_recycler.layoutManager = LinearLayoutManager(context)
+        device_recycler.adapter = device_list_adapter
+    }
+}
+
+
 class DemoObjectFragment : Fragment() {
 
     override fun onCreateView(

@@ -4,11 +4,10 @@ import android.app.Application
 import android.content.Context
 import android.view.View
 import android.widget.AdapterView
-import androidx.databinding.Observable
-import androidx.databinding.ObservableArrayMap
-import androidx.databinding.ObservableField
-import androidx.databinding.PropertyChangeRegistry
+import androidx.collection.ArrayMap
+import androidx.databinding.*
 import androidx.lifecycle.AndroidViewModel
+import androidx.recyclerview.widget.RecyclerView
 import io.crossbar.autobahn.wamp.Client
 import io.crossbar.autobahn.wamp.Session
 import io.crossbar.autobahn.wamp.types.*
@@ -40,6 +39,12 @@ val TEXT_DISCONNECT = "Disconnect"
 data class BrightnessValue(
     var brightness: Int
 )
+
+class ObservableWithListTrapdoor: ObservableArrayMap<Any, Any>() {
+    fun as_list(): List<Any> {
+        return this.toList()
+    }
+}
 
 
 open class MainViewModel(application: Application) : AndroidViewModel(application), Observable {
@@ -75,6 +80,12 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
     var list_machines: MutableMap<String, Machine> = ObservableArrayMap<String, Machine>()
     var list_devices: MutableMap<String, Device> = ObservableArrayMap<String, Device>()
 
+    @BindingAdapter("bind:items")
+    fun device_ddd(recyclerView: RecyclerView, args: List<Device>) {
+        val adapter = recyclerView.adapter as DeviceListAdapter
+        adapter.setPlaces(args)
+    }
+
     private val callbacks: PropertyChangeRegistry by lazy { PropertyChangeRegistry() }
 
     override fun addOnPropertyChangedCallback(callback: Observable.OnPropertyChangedCallback) {
@@ -108,6 +119,8 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
         connected_viz.set(View.GONE)
         connectionText.set(TEXT_CONNECT)
 
+//        list_devices.watch
+
 
     }
 
@@ -134,6 +147,7 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
         log { list_links.toString() }
         log { list_sinks.toString() }
         log { list_srcs.toString() }
+        notifyChange()
 
     }
 
