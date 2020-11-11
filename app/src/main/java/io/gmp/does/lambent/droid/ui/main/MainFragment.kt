@@ -115,7 +115,7 @@ class DeviceListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val device_list_adapter = DeviceListAdapter()
-//        device_list_adapter.setPlaces(viewModel.list_devices.values.toList())
+        device_list_adapter.setPlaces(viewModel.list_devices.values.toList())
         device_recycler.layoutManager = LinearLayoutManager(context)
         device_recycler.adapter = device_list_adapter
     }
