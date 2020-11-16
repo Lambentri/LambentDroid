@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <data class=".SubBindingDevices">
+    <data class=".SubBindingLinks">
 
         <variable
             name="viewModel"
@@ -16,13 +16,13 @@
         android:orientation="vertical">
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/device_recycler"
+            android:id="@+id/link_recycler"
             android:layout_width="match_parent"
             android:layout_height="500dp"
             android:gravity="center"
             android:padding="8dp"
             tools:listitem="@layout/devices_item"
-            app:items="@{viewModel.list_devices_rl}"
+            app:items_links="@{viewModel.list_links_rl}"
             />
     </LinearLayout>
 </layout>

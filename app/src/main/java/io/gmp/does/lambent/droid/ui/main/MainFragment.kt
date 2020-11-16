@@ -13,16 +13,16 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
-import io.gmp.does.lambent.droid.DeviceListAdapter
-import io.gmp.does.lambent.droid.MainBinding
-import io.gmp.does.lambent.droid.R
-import io.gmp.does.lambent.droid.SubBindingDevices
+import io.gmp.does.lambent.droid.*
 import kotlinx.android.synthetic.main.fragment_tab_devices.*
+import kotlinx.android.synthetic.main.fragment_tab_links.*
+import kotlinx.android.synthetic.main.fragment_tab_machines.*
 
 val Labels = listOf<String>(
     "Devices",
-    "Machines",
+    "Machs",
     "Links",
+    "Zones",
     "Sets"
 )
 
@@ -38,7 +38,8 @@ class DemoCollectionAdapter(fragment: Fragment) : FragmentStateAdapter(fragment)
         // Return a NEW fragment instance in createFragment(int)
         when (position) {
             0 ->  DeviceListFragment()
-            1 ->  DeviceListFragment()
+            1 ->  MachineListFragment()
+            2 ->  LinkListFragment()
             else -> DemoObjectFragment()
             }
 
@@ -115,9 +116,59 @@ class DeviceListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val device_list_adapter = DeviceListAdapter()
-        device_list_adapter.setPlaces(viewModel.list_devices.values.toList())
+        device_list_adapter.setDevices(viewModel.list_devices.values.toList())
         device_recycler.layoutManager = LinearLayoutManager(context)
         device_recycler.adapter = device_list_adapter
+    }
+}
+
+class MachineListFragment : Fragment() {
+
+    lateinit var viewModel: MainViewModel
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        val binding = DataBindingUtil.inflate<SubBindingMachines>(inflater, R.layout.fragment_tab_machines, container, false)
+        viewModel = ViewModelProviders.of(this).get(MainViewModel::class.java)
+        val view: View = binding.root
+        binding.setLifecycleOwner(this)
+        binding.viewModel = viewModel
+        return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        val device_list_adapter = MachineListAdapter()
+        device_list_adapter.setMachines(viewModel.list_machines.values.toList())
+        machine_recycler.layoutManager = LinearLayoutManager(context)
+        machine_recycler.adapter = device_list_adapter
+    }
+}
+
+class LinkListFragment : Fragment() {
+
+    lateinit var viewModel: MainViewModel
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        val binding = DataBindingUtil.inflate<SubBindingLinks>(inflater, R.layout.fragment_tab_links, container, false)
+        viewModel = ViewModelProviders.of(this).get(MainViewModel::class.java)
+        val view: View = binding.root
+        binding.setLifecycleOwner(this)
+        binding.viewModel = viewModel
+        return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        val device_list_adapter = LinkListAdapter()
+        device_list_adapter.setLinks(viewModel.list_links.values.toList())
+        link_recycler.layoutManager = LinearLayoutManager(context)
+        link_recycler.adapter = device_list_adapter
     }
 }
 

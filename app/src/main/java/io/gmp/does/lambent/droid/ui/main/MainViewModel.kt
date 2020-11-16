@@ -4,7 +4,6 @@ import android.app.Application
 import android.content.Context
 import android.view.View
 import android.widget.AdapterView
-import androidx.collection.ArrayMap
 import androidx.databinding.*
 import androidx.lifecycle.AndroidViewModel
 import androidx.recyclerview.widget.RecyclerView
@@ -40,15 +39,7 @@ data class BrightnessValue(
     var brightness: Int
 )
 
-class ObservableWithListTrapdoor: ObservableArrayMap<Any, Any>() {
-    fun as_list(): List<Any> {
-        return this.toList()
-    }
-}
-
-
 open class MainViewModel(application: Application) : AndroidViewModel(application), Observable {
-    // TODO: Implement the ViewModel
     val TAG: String = "io.gmp.does.droid.main"
     private val PREFS_NAME: String? = "LambentDroid"
     val shared_prefs =
@@ -80,11 +71,108 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
     var list_machines: MutableMap<String, Machine> = ObservableArrayMap<String, Machine>()
     var list_devices: MutableMap<String, Device> = ObservableArrayMap<String, Device>()
 
-    @BindingAdapter("bind:items")
-    fun device_ddd(recyclerView: RecyclerView, args: List<Device>) {
-        val adapter = recyclerView.adapter as DeviceListAdapter
-        adapter.setPlaces(args)
+    var list_devices_l_t: MutableList<Device> = ObservableArrayList<Device>()
+
+    fun list_devices_rl(): List<Device> {
+        return listOf(
+            Device(iname = "xxx", id = "fff", name = "yyy", bpp = BPP.RGB),
+            Device(iname = "qqq", id = "fff", name = "rrr", bpp = BPP.RGB),
+            Device(iname = "zzz", id = "fff", name = "vvv", bpp = BPP.RGB)
+        )
+        return list_devices.values.toList()
     }
+
+    fun list_machines_rl(): List<Machine> {
+        return listOf(
+            Machine(
+                name = "SolidStep",
+                running = RunningEnum.RUNNING,
+                id = "blah",
+                desc = "fff",
+                speed = TickEnum.MINS,
+                iname = "StaticRuby"
+            ),
+            Machine(
+                name = "SolidStep",
+                running = RunningEnum.RUNNING,
+                id = "blah",
+                desc = "fff",
+                speed = TickEnum.ONES,
+                iname = "StaticEmerald"
+            ),
+            Machine(
+                name = "SolidStep",
+                running = RunningEnum.RUNNING,
+                id = "blah",
+                desc = "fff",
+                speed = TickEnum.TWENTYS,
+                iname = "StaticSapphire"
+            )
+        )
+    }
+
+    fun list_links_rl(): List<Link> {
+        return listOf(
+            Link(
+                "StubbyGlow", active = true, list_name = "StubbyGlow", full_spec = LinkSpec(
+                    source = LinkSpecSrc(
+                        listname = "StaticRuby",
+                        ttl = "",
+                        id = "",
+                        cls = "SolidStep"
+                    ),
+                    target = LinkSpecTgt(
+                        listname = "GlowBed",
+                        grp = "8266",
+                        iname = "GlowBed",
+                        id = "",
+                        name = "192.168.13.66"
+                    )
+                )
+            ),
+            Link(
+                "FranticGloom", active = false, list_name = "FranticGloom", full_spec = LinkSpec(
+                    source = LinkSpecSrc(
+                        listname = "StaticEmerald",
+                        ttl = "",
+                        id = "",
+                        cls = "SolidStep"
+                    ),
+                    target = LinkSpecTgt(
+                        listname = "Doorway",
+                        grp = "8266",
+                        iname = "Doorway",
+                        id = "",
+                        name = "192.168.13.68"
+                    )
+                )
+            )
+        )
+    }
+
+    companion object {
+        @BindingAdapter("items")
+        @JvmStatic
+        fun device_list(recyclerView: RecyclerView, args: List<Device>) {
+            val adapter = recyclerView.adapter as DeviceListAdapter
+            adapter.setDevices(args)
+        }
+
+        @BindingAdapter("items_machines")
+        @JvmStatic
+        fun machine_list(recyclerView: RecyclerView, args: List<Machine>) {
+            val adapter = recyclerView.adapter as MachineListAdapter
+            adapter.setMachines(args)
+        }
+
+        @BindingAdapter("items_links")
+        @JvmStatic
+        fun link_list(recyclerView: RecyclerView, args: List<Link>) {
+            val adapter = recyclerView.adapter as LinkListAdapter
+            adapter.setLinks(args)
+        }
+    }
+
 
     private val callbacks: PropertyChangeRegistry by lazy { PropertyChangeRegistry() }
 
@@ -125,9 +213,9 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
     }
 
     fun link_listener(args: List<Any>, kwargs: Map<String, Any>, details: EventDetails) {
-        log { "Got Link Update" }
-        log { kwargs.toString() }
-        log { details.toString() }
+//        log { "Got Link Update" }
+//        log { kwargs.toString() }
+//        log { details.toString() }
 
         val links = kwargs.get("links") as Map<String, Map<String, Any>>
         val sinks = kwargs.get("sinks") as List<Map<String, String>>
@@ -144,9 +232,9 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
             val s = LinkSrc.fromNetwork(entry)
             list_srcs[s.id] = s
         }
-        log { list_links.toString() }
-        log { list_sinks.toString() }
-        log { list_srcs.toString() }
+//        log { list_links.toString() }
+//        log { list_sinks.toString() }
+//        log { list_srcs.toString() }
         notifyChange()
 
     }
@@ -158,9 +246,13 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
 
         val entries: ArrayList<Map<String, String>> =
             kwargs.get("res") as ArrayList<Map<String, String>>
+
+        list_devices_l_t.clear()
         for (entry in entries) {
             val d = Device.fromNetwork(entry)
             list_devices[d.id] = d
+            list_devices_l_t.add(d)
+
         }
         log { list_devices.toString() }
     }

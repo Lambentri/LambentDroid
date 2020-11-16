@@ -8,4 +8,7 @@
     <string name="connection_realm">Realm</string>
 
     <string name="label_brightness">Brightness</string>
+
+    <string name="device_button_desc_flash">Flash this device to locate it</string>
+    <string name="device_button_desc_rename">Change the given name of this device</string>
 </resources>
