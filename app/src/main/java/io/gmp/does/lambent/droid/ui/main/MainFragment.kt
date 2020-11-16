@@ -64,22 +64,20 @@ class MainFragment : Fragment() {
     private lateinit var viewPager: ViewPager2
     private lateinit var tabLayout: TabLayout
     private lateinit var commandCollectionAdapter: DemoCollectionAdapter
-
+    private lateinit var binding: MainBinding
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
-        val binding = DataBindingUtil.inflate<MainBinding>(inflater, R.layout.main_fragment, container, false)
-        val viewModel = ViewModelProviders.of(this).get(MainViewModel::class.java)
-        val view: View = binding.root
-        binding.setLifecycleOwner(this)
-        binding.viewModel = viewModel
-
-        return view
+        binding = DataBindingUtil.inflate(inflater, R.layout.main_fragment, container, false)
+        return binding.root
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProviders.of(this).get(MainViewModel::class.java)
+        viewModel = ViewModelProviders.of(activity!!).get(MainViewModel::class.java)
+
+        binding.lifecycleOwner = activity
+        binding.viewModel = viewModel
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -116,7 +114,7 @@ class DeviceListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val device_list_adapter = DeviceListAdapter()
-        device_list_adapter.setDevices(viewModel.list_devices.values.toList())
+        device_list_adapter.setDevices(viewModel.list_devices.value!!.values.toList())
         device_recycler.layoutManager = LinearLayoutManager(context)
         device_recycler.adapter = device_list_adapter
     }

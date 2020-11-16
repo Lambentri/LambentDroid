@@ -6,6 +6,7 @@ import android.view.View
 import android.widget.AdapterView
 import androidx.databinding.*
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
 import io.crossbar.autobahn.wamp.Client
 import io.crossbar.autobahn.wamp.Session
@@ -69,17 +70,17 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
     var list_srcs: MutableMap<String, LinkSrc> = ObservableArrayMap<String, LinkSrc>()
     var list_sinks: MutableMap<String, LinkSink> = ObservableArrayMap<String, LinkSink>()
     var list_machines: MutableMap<String, Machine> = ObservableArrayMap<String, Machine>()
-    var list_devices: MutableMap<String, Device> = ObservableArrayMap<String, Device>()
+    var list_devices: MutableLiveData<MutableMap<String, Device>> = MutableLiveData(mutableMapOf())
 
     var list_devices_l_t: MutableList<Device> = ObservableArrayList<Device>()
 
     fun list_devices_rl(): List<Device> {
-        return listOf(
-            Device(iname = "xxx", id = "fff", name = "yyy", bpp = BPP.RGB),
-            Device(iname = "qqq", id = "fff", name = "rrr", bpp = BPP.RGB),
-            Device(iname = "zzz", id = "fff", name = "vvv", bpp = BPP.RGB)
-        )
-        return list_devices.values.toList()
+//        return listOf(
+//            Device(iname = "xxx", id = "fff", name = "yyy", bpp = BPP.RGB),
+//            Device(iname = "qqq", id = "fff", name = "rrr", bpp = BPP.RGB),
+//            Device(iname = "zzz", id = "fff", name = "vvv", bpp = BPP.RGB)
+//        )
+        return list_devices.value!!.values.toList()
     }
 
     fun list_machines_rl(): List<Machine> {
@@ -153,9 +154,11 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
     companion object {
         @BindingAdapter("items")
         @JvmStatic
-        fun device_list(recyclerView: RecyclerView, args: List<Device>) {
+        fun setItems(recyclerView: RecyclerView, args: MutableLiveData<Map<String, Device>>) {
             val adapter = recyclerView.adapter as DeviceListAdapter
-            adapter.setDevices(args)
+            if (args.value!! != adapter.items) {
+                adapter.setDevices(args.value!!.values.toList())
+            }
         }
 
         @BindingAdapter("items_machines")
@@ -250,11 +253,11 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
         list_devices_l_t.clear()
         for (entry in entries) {
             val d = Device.fromNetwork(entry)
-            list_devices[d.id] = d
+            list_devices.value!![d.id] = d
             list_devices_l_t.add(d)
-
         }
-        log { list_devices.toString() }
+        list_devices.postValue(list_devices.value)
+        log { list_devices.value!!.toString() }
     }
 
     fun add_subscriptions(session: Session, details: SessionDetails) {
