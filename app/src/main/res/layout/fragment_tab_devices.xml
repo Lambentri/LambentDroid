@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data class=".SubBindingDevices">
-
         <variable
             name="viewModel"
             type="io.gmp.does.lambent.droid.ui.main.MainViewModel" />
@@ -15,14 +14,14 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/device_recycler"
-            android:layout_width="match_parent"
-            android:layout_height="500dp"
-            android:gravity="center"
-            android:padding="8dp"
-            tools:listitem="@layout/devices_item"
-            app:items="@{viewModel.list_devices_rl}"
-            />
+<!--        <androidx.recyclerview.widget.RecyclerView-->
+<!--            android:id="@+id/device_recycler"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="500dp"-->
+<!--            android:gravity="center"-->
+<!--            android:padding="8dp"-->
+<!--            tools:listitem="@layout/devices_item"-->
+<!--            items_devices="@{viewModel.list_devices_l_t}"-->
+<!--            />-->
     </LinearLayout>
 </layout>

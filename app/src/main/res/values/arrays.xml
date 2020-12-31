@@ -2,10 +2,12 @@
 <resources>
     <string-array name="brightness_slider_values">
         <item value="0">Off</item>
-        <item value="1">5%</item>
-        <item value="2">10%</item>
-        <item value="3">25%</item>
-        <item value="4">50%</item>
-        <item value="5">100%</item>
+        <item value="1">Dim</item>
+        <item value="2">㉜⁻¹</item>
+        <item value="3">⑯⁻¹</item>
+        <item value="4">⅛</item>
+        <item value="5">¼</item>
+        <item value="6">½</item>
+        <item value="7">Full</item>
     </string-array>
 </resources>

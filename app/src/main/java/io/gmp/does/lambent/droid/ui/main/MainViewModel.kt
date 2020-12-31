@@ -1,11 +1,16 @@
 package io.gmp.does.lambent.droid.ui.main
 
 import android.app.Application
+import android.app.PendingIntent.getActivity
 import android.content.Context
 import android.view.View
 import android.widget.AdapterView
+import android.widget.ImageButton
 import androidx.databinding.*
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import io.crossbar.autobahn.wamp.Client
 import io.crossbar.autobahn.wamp.Session
@@ -16,20 +21,25 @@ import java.util.concurrent.CompletableFuture
 
 val POSITION_TO_BRIGHTNESS = mapOf(
     0 to 0,
-    1 to 20,
-    2 to 10,
-    3 to 4,
-    4 to 2,
-    5 to 1
+    1 to 3,
+    2 to 7,
+    3 to 15,
+    4 to 31,
+    5 to 63,
+    6 to 127,
+    7 to 255
+
 )
 
 val BRIGHTNESS_TO_POSITION = mapOf(
-    0 to 0,
-    20 to 1,
-    10 to 2,
-    4 to 3,
-    2 to 4,
-    1 to 5
+    255 to 7,
+    127 to 6,
+    63 to 5,
+    31 to 4,
+    15 to 3,
+    7 to 2,
+    3 to 1,
+    0 to 0
 )
 
 val TEXT_CONNECT = "Connect"
@@ -47,6 +57,7 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
 
     //    lateinit var brightness_slider: Slider
     var connecting: Boolean = false;
+    var joined: Boolean = false
 
     var connecting_viz = ObservableField<Int>()
     val connected_viz = ObservableField<Int>()
@@ -71,16 +82,8 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
     var list_machines: MutableMap<String, Machine> = ObservableArrayMap<String, Machine>()
     var list_devices: MutableMap<String, Device> = ObservableArrayMap<String, Device>()
 
-    var list_devices_l_t: MutableList<Device> = ObservableArrayList<Device>()
-
-    fun list_devices_rl(): List<Device> {
-        return listOf(
-            Device(iname = "xxx", id = "fff", name = "yyy", bpp = BPP.RGB),
-            Device(iname = "qqq", id = "fff", name = "rrr", bpp = BPP.RGB),
-            Device(iname = "zzz", id = "fff", name = "vvv", bpp = BPP.RGB)
-        )
-        return list_devices.values.toList()
-    }
+    //    var list_devices_l_t: MutableLiveData<List<Device>> = MutableLiveData()
+    var list_devices_l_t = MutableLiveData<List<Device>>()
 
     fun list_machines_rl(): List<Machine> {
         return listOf(
@@ -150,12 +153,13 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
         )
     }
 
+
     companion object {
-        @BindingAdapter("items")
+        @BindingAdapter("items_devices")
         @JvmStatic
-        fun device_list(recyclerView: RecyclerView, args: List<Device>) {
+        fun device_list(recyclerView: RecyclerView, items_devices: List<Device>) {
             val adapter = recyclerView.adapter as DeviceListAdapter
-            adapter.setDevices(args)
+            adapter.setDevices(items_devices)
         }
 
         @BindingAdapter("items_machines")
@@ -197,7 +201,6 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
         host_name.set(shared_prefs.getString("host_name", "192.168.1.1"))
         host_port.set(shared_prefs.getString("host_port", "8083"));
         host_realm.set(shared_prefs.getString("host_realm", "realm1"));
-        notifyChange()
 
         session.addOnJoinListener(::add_subscriptions)
         session.addOnJoinListener(::onJoin)
@@ -207,9 +210,17 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
         connected_viz.set(View.GONE)
         connectionText.set(TEXT_CONNECT)
 
-//        list_devices.watch
 
+        list_devices_l_t.value = emptyList<Device>()
+//        list_devices_l_t.postValue(emptyList<Device>())
+    }
 
+    fun brightness_listener(args: List<Any>, kwargs: Map<String, Any>, details: EventDetails) {
+        log { "Got Brightness Update" }
+        log { kwargs.toString() }
+        log { details.toString() }
+        val brightness = kwargs.get("brightness") as Int
+        brightnessSelectedPosition = BRIGHTNESS_TO_POSITION[brightness]!!
     }
 
     fun link_listener(args: List<Any>, kwargs: Map<String, Any>, details: EventDetails) {
@@ -232,9 +243,6 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
             val s = LinkSrc.fromNetwork(entry)
             list_srcs[s.id] = s
         }
-//        log { list_links.toString() }
-//        log { list_sinks.toString() }
-//        log { list_srcs.toString() }
         notifyChange()
 
     }
@@ -247,22 +255,23 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
         val entries: ArrayList<Map<String, String>> =
             kwargs.get("res") as ArrayList<Map<String, String>>
 
-        list_devices_l_t.clear()
         for (entry in entries) {
             val d = Device.fromNetwork(entry)
             list_devices[d.id] = d
-            list_devices_l_t.add(d)
-
         }
+        list_devices_l_t.value = list_devices.values.toList()
+
+
         log { list_devices.toString() }
     }
 
     fun add_subscriptions(session: Session, details: SessionDetails) {
-        val subLinksFuture: CompletableFuture<Subscription> = session.subscribe(
-            "com.lambentri.edge.la4.links",
-            ::link_listener
+        val brightnessControlFuture: CompletableFuture<Subscription> = session.subscribe(
+            "com.lambentri.edge.la4.machine.gb",
+            ::brightness_listener
         )
-        subLinksFuture.whenComplete({ subscription, throwable ->
+
+        brightnessControlFuture.whenComplete { subscription, throwable ->
             if (throwable == null) {
                 // We have successfully subscribed.
                 log { "Subscribed to topic " + subscription.topic }
@@ -271,13 +280,28 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
                 // Something went bad.
                 throwable.printStackTrace()
             }
-        })
+        }
+
+        val subLinksFuture: CompletableFuture<Subscription> = session.subscribe(
+            "com.lambentri.edge.la4.links",
+            ::link_listener
+        )
+        subLinksFuture.whenComplete { subscription, throwable ->
+            if (throwable == null) {
+                // We have successfully subscribed.
+                log { "Subscribed to topic " + subscription.topic }
+                System.out.println("Subscribed to topic " + subscription.topic)
+            } else {
+                // Something went bad.
+                throwable.printStackTrace()
+            }
+        }
 
         val subDevicesFuture: CompletableFuture<Subscription> = session.subscribe(
             "com.lambentri.edge.la4.machine.sink.8266-7777", // TODO generic device governor
             ::device_listener
         )
-        subDevicesFuture.whenComplete({ subscription, throwable ->
+        subDevicesFuture.whenComplete { subscription, throwable ->
             if (throwable == null) {
                 // We have successfully subscribed.
                 log { "Subscribed to topic " + subscription.topic }
@@ -286,7 +310,7 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
                 // Something went bad.
                 throwable.printStackTrace()
             }
-        })
+        }
 
     }
 
@@ -298,6 +322,7 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
         connected_viz.set(View.VISIBLE)
         connectionText.set(TEXT_DISCONNECT)
 
+
         session.call("com.lambentri.edge.la4.machine.gb.get").thenAccept {
             log { it.results.get(0).toString() }
             val pos = (it.results.get(0) as Map<String, Int>).get("brightness")
@@ -305,9 +330,12 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
             brightnessSelectedPosition = BRIGHTNESS_TO_POSITION[pos!!]!!
             notifyChange()
         }
+
+        joined = true
     }
 
     fun onDc(session: Session, details: CloseDetails) {
+        joined = false
         connection_status.set("Status: Ready to Connect")
         log { "dcd" }
         connecting_viz.set(View.VISIBLE)
@@ -347,8 +375,9 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
 
         override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
             val currentItem = parent!!.getItemAtPosition(position) as String
-            if (currentItem != null) {
+            if (currentItem != null && joined) {
                 log { currentItem.toString() }
+                brightnessSelectedPosition = position
                 if (session.isConnected()) {
                     session.call(
                         "com.lambentri.edge.la4.machine.gb.set",
@@ -356,6 +385,39 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
                     )
                 }
             }
+        }
+    }
+
+    fun off() {
+        if (session.isConnected()) {
+            session.call(
+                "com.lambentri.edge.la4.machine.gb.set",
+                POSITION_TO_BRIGHTNESS[0]
+            )
+        }
+    }
+
+    fun device_poke(entryId: String) {
+        log { "netPOKER " }
+        if (session.isConnected()) {
+            session.call(
+                "com.lambentri.edge.la4.device.82667777.poke",
+                entryId
+            )
+        }
+    }
+
+    fun device_rename(entryIname: String, newName: String) {
+        log { "netRENAMER" }
+        if (session.isConnected()) {
+            val call_map = mapOf<String, String>(
+                "shortname" to entryIname,
+                "nicename" to newName
+            )
+            session.call(
+                "com.lambentri.edge.la4.device.82667777.name",
+                call_map
+            )
         }
     }
 

@@ -7,6 +7,10 @@
         <variable
             name="item"
             type="io.gmp.does.lambent.droid.Device" />
+
+        <variable
+            name="viewModel"
+            type="io.gmp.does.lambent.droid.ui.main.MainViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -19,20 +23,20 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
+            android:fontFamily="sans-serif-condensed"
             android:text="@{item.id}"
             android:textSize="32sp"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="@tools:sample/cities"
-            android:fontFamily="sans-serif-condensed"/>
+            tools:text="@tools:sample/cities" />
 
         <ImageButton
             android:id="@+id/device_button_rename"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_gravity="center_vertical"
-            android:layout_marginTop="8dp"
             android:layout_marginHorizontal="8dp"
+            android:layout_marginTop="8dp"
             android:background="@drawable/ic_baseline_edit_24"
             android:contentDescription="@string/device_button_desc_rename"
             android:scaleType="fitXY"
@@ -45,8 +49,8 @@
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_gravity="center_vertical"
-            android:layout_marginTop="8dp"
             android:layout_marginHorizontal="8dp"
+            android:layout_marginTop="8dp"
             android:background="@drawable/ic_baseline_flash_on_24"
             android:contentDescription="@string/device_button_desc_flash"
             android:scaleType="fitXY"

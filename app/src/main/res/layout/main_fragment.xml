@@ -124,6 +124,7 @@
                 </LinearLayout>
 
                 <TextView
+                    android:paddingHorizontal="10dp"
                     android:id="@+id/connection_status"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -143,6 +144,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:paddingHorizontal="10dp"
                     android:orientation="horizontal">
                     <TextView
                         android:id="@+id/brightness_label"
@@ -150,7 +152,7 @@
                         android:layout_height="wrap_content"
                         android:text="@string/label_brightness" />
                     <Spinner
-                        android:layout_width="match_parent"
+                        android:layout_width="260dp"
                         android:layout_height="40dp"
                         android:id="@+id/brightness_spinner"
                         android:entries="@array/brightness_slider_values"
@@ -159,16 +161,25 @@
                         />
                 </LinearLayout>
 
-                <com.google.android.material.tabs.TabLayout
-                    android:id="@+id/tab_layout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+<!--                <com.google.android.material.tabs.TabLayout-->
+<!--                    android:id="@+id/tab_layout"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content" />-->
 
-                <androidx.viewpager2.widget.ViewPager2
-                    android:id="@+id/tab_pager"
+<!--                <androidx.viewpager2.widget.ViewPager2-->
+<!--                    android:id="@+id/tab_pager"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_weight="1" />-->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/device_recycler"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1" />
+                    android:layout_height="500dp"
+                    android:gravity="center"
+                    android:padding="8dp"
+                    tools:listitem="@layout/devices_item"
+                    items_devices="@{viewModel.list_devices_l_t}"
+                    />
             </LinearLayout>
 
 
