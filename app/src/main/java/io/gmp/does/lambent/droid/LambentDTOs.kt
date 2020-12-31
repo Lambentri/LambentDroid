@@ -2,6 +2,26 @@ package io.gmp.does.lambent.droid
 
 import java.time.LocalDate
 
+data class MachineQuery(
+    val machines: Map<String, Machine>,
+    val speed_enum: Map<String, String>
+) {
+    companion object {
+        fun fromNetwork(map: Map<String, String>) = object {
+            val machines = map["machines"] as Map<String, Map<String, String>>
+            val machines_ds = machines.map {
+                it.key to Machine.fromNetwork(it.value)
+            }.toMap()
+            val speed_enum = map["speed_enum"] as Map<String, String>
+
+            val data = MachineQuery(
+                machines = machines_ds,
+                speed_enum = speed_enum
+            )
+        }.data
+    }
+}
+
 data class Machine(
     val name: String,
     val running: RunningEnum,
@@ -19,7 +39,14 @@ data class Machine(
             val speed: String by map
             val iname: String? by map
 
-            val data = Machine(name, RunningEnum.valueOf(running), id, desc, TickEnum.valueOf(speed), iname)
+            val data = Machine(
+                name,
+                RunningEnum.valueOf(running),
+                id,
+                desc,
+                TickEnum.valueOf(speed),
+                iname
+            )
         }.data
     }
 }
@@ -45,25 +72,25 @@ data class Device(
 }
 
 data class LinkSpecSrc(
-    val listname: String,
+    val list_name: String,
     val ttl: String,
     val id: String,
     val cls: String
 ) {
     companion object {
         fun fromNetwork(map: Map<String, Any>) = object {
-            val listname: String by map
+            val list_name: String by map
             val ttl: String by map
             val id: String by map
             val cls: String by map
 
-            val data = LinkSpecSrc(listname, ttl, id, cls)
+            val data = LinkSpecSrc(list_name, ttl, id, cls)
         }.data
     }
 }
 
 data class LinkSpecTgt(
-    val listname: String,
+    val list_name: String,
     val grp: String,
     val iname: String,
     val id: String,
@@ -71,13 +98,13 @@ data class LinkSpecTgt(
 ) {
     companion object {
         fun fromNetwork(map: Map<String, Any>) = object {
-            val listname: String by map
+            val list_name: String by map
             val grp: String by map
             val iname: String by map
             val id: String by map
             val name: String by map
 
-            val data = LinkSpecTgt(listname, grp, iname, id, name)
+            val data = LinkSpecTgt(list_name, grp, iname, id, name)
         }.data
     }
 }
@@ -120,26 +147,26 @@ data class Link(
 
 
 class LinkSrc(
-    val listname: String,
+    val list_name: String,
     val ttl: String,
     val id: String,
     val cls: String
 ) {
     companion object {
         fun fromNetwork(map: Map<String, String>) = object {
-            val listname: String by map
+            val list_name: String by map
             val ttl: String by map
             val id: String by map
             val cls: String by map
 
-            val data = LinkSrc(listname, ttl, id, cls)
+            val data = LinkSrc(list_name, ttl, id, cls)
         }.data
     }
 }
 
 
 class LinkSink(
-    val listname: String,
+    val list_name: String,
     val grp: String,
     val iname: String,
     val id: String,
@@ -147,13 +174,13 @@ class LinkSink(
 ) {
     companion object {
         fun fromNetwork(map: Map<String, String>) = object {
-            val listname: String by map
+            val list_name: String by map
             val grp: String by map
             val iname: String by map
             val id: String by map
             val name: String by map
 
-            val data = LinkSink(listname, grp, iname, id, name)
+            val data = LinkSink(list_name, grp, iname, id, name)
         }.data
     }
 }

@@ -1,16 +1,12 @@
 package io.gmp.does.lambent.droid.ui.main
 
 import android.app.Application
-import android.app.PendingIntent.getActivity
 import android.content.Context
 import android.view.View
 import android.widget.AdapterView
-import android.widget.ImageButton
 import androidx.databinding.*
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import io.crossbar.autobahn.wamp.Client
 import io.crossbar.autobahn.wamp.Session
@@ -18,6 +14,7 @@ import io.crossbar.autobahn.wamp.types.*
 import io.crossbar.autobahn.websocket.types.WebSocketOptions
 import io.gmp.does.lambent.droid.*
 import java.util.concurrent.CompletableFuture
+
 
 val POSITION_TO_BRIGHTNESS = mapOf(
     0 to 0,
@@ -84,74 +81,8 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
 
     //    var list_devices_l_t: MutableLiveData<List<Device>> = MutableLiveData()
     var list_devices_l_t = MutableLiveData<List<Device>>()
-
-    fun list_machines_rl(): List<Machine> {
-        return listOf(
-            Machine(
-                name = "SolidStep",
-                running = RunningEnum.RUNNING,
-                id = "blah",
-                desc = "fff",
-                speed = TickEnum.MINS,
-                iname = "StaticRuby"
-            ),
-            Machine(
-                name = "SolidStep",
-                running = RunningEnum.RUNNING,
-                id = "blah",
-                desc = "fff",
-                speed = TickEnum.ONES,
-                iname = "StaticEmerald"
-            ),
-            Machine(
-                name = "SolidStep",
-                running = RunningEnum.RUNNING,
-                id = "blah",
-                desc = "fff",
-                speed = TickEnum.TWENTYS,
-                iname = "StaticSapphire"
-            )
-        )
-    }
-
-    fun list_links_rl(): List<Link> {
-        return listOf(
-            Link(
-                "StubbyGlow", active = true, list_name = "StubbyGlow", full_spec = LinkSpec(
-                    source = LinkSpecSrc(
-                        listname = "StaticRuby",
-                        ttl = "",
-                        id = "",
-                        cls = "SolidStep"
-                    ),
-                    target = LinkSpecTgt(
-                        listname = "GlowBed",
-                        grp = "8266",
-                        iname = "GlowBed",
-                        id = "",
-                        name = "192.168.13.66"
-                    )
-                )
-            ),
-            Link(
-                "FranticGloom", active = false, list_name = "FranticGloom", full_spec = LinkSpec(
-                    source = LinkSpecSrc(
-                        listname = "StaticEmerald",
-                        ttl = "",
-                        id = "",
-                        cls = "SolidStep"
-                    ),
-                    target = LinkSpecTgt(
-                        listname = "Doorway",
-                        grp = "8266",
-                        iname = "Doorway",
-                        id = "",
-                        name = "192.168.13.68"
-                    )
-                )
-            )
-        )
-    }
+    var list_machined_l_t = MutableLiveData<List<Machine>>()
+    var list_links_l_t = MutableLiveData<List<Link>>()
 
 
     companion object {
@@ -212,7 +143,8 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
 
 
         list_devices_l_t.value = emptyList<Device>()
-//        list_devices_l_t.postValue(emptyList<Device>())
+        list_machined_l_t.value = emptyList<Machine>()
+        list_links_l_t.value = emptyList<Link>()
     }
 
     fun brightness_listener(args: List<Any>, kwargs: Map<String, Any>, details: EventDetails) {
@@ -224,25 +156,31 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
     }
 
     fun link_listener(args: List<Any>, kwargs: Map<String, Any>, details: EventDetails) {
-//        log { "Got Link Update" }
-//        log { kwargs.toString() }
+        log { "Got Link Update" }
+        log { kwargs.toString() }
 //        log { details.toString() }
 
         val links = kwargs.get("links") as Map<String, Map<String, Any>>
         val sinks = kwargs.get("sinks") as List<Map<String, String>>
         val srcs = kwargs.get("srcs") as List<Map<String, String>>
-        for ((key: String, entry: Map<String, Any>) in links) {
-            list_links[key] = Link.fromNetwork(entry)
-        }
-        for (entry in sinks) {
-            val s = LinkSink.fromNetwork(entry)
-            list_sinks[s.id] = s
-        }
-
-        for (entry in srcs) {
-            val s = LinkSrc.fromNetwork(entry)
-            list_srcs[s.id] = s
-        }
+//        for ((key: String, entry: Map<String, Any>) in links) {
+//            list_links[key] = Link.fromNetwork(entry)
+//        }
+        log { links.map{it.key to Link.fromNetwork(it.value)}.toMap().toMutableMap().toString() }
+        list_links = links.map{it.key to Link.fromNetwork(it.value)}.toMap().toMutableMap()
+//        list_sinks = sinks.map{it.key to LinkSink.fromNetwork(it.value)}.toMap().toMutableMap()
+//        for (entry in sinks) {
+//            val s = LinkSink.fromNetwork(entry)
+//            list_sinks[s.id] = s
+//        }
+//
+//        for (entry in srcs) {
+//            val s = LinkSrc.fromNetwork(entry)
+//            list_srcs[s.id] = s
+//        }
+        log {"wew"}
+        list_links_l_t.value = list_links.values.toList()
+        log {"lad"}
         notifyChange()
 
     }
@@ -264,6 +202,21 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
 
         log { list_devices.toString() }
     }
+
+    fun machine_collector(session: Session) {
+        log { "Collecting Machines" }
+
+        session.call("com.lambentri.edge.la4.machine.list").thenAccept { it ->
+            log { "Collected" }
+            val machine_result = MachineQuery.fromNetwork(it.results.get(0) as Map<String, String>)
+            for (entry: Machine in machine_result.machines.values) {
+                list_machines[entry.id] = entry
+            }
+            list_machined_l_t.value = list_machines.values.toList()
+            notifyChange()
+        }
+    }
+
 
     fun add_subscriptions(session: Session, details: SessionDetails) {
         val brightnessControlFuture: CompletableFuture<Subscription> = session.subscribe(

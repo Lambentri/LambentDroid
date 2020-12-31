@@ -49,7 +49,7 @@ class LinkMainViewHolder internal constructor(inflater: LayoutInflater, parent: 
             Toast.makeText(parent.context, "RM Clicked", Toast.LENGTH_SHORT).show()
         }
         toggle.setOnCheckedChangeListener { buttonView: CompoundButton, isChecked: Boolean ->
-            Toast.makeText(parent.context, "Toggle Clicked {$isChecked}", Toast.LENGTH_SHORT).show()
+//            Toast.makeText(parent.context, "Toggle Clicked {$isChecked}", Toast.LENGTH_SHORT).show()
         }
 
     }
@@ -57,8 +57,8 @@ class LinkMainViewHolder internal constructor(inflater: LayoutInflater, parent: 
     fun bind(device: Link) {
         item = device
         label_name.text = device.list_name
-        label_from.text = device.full_spec.source.listname
-        label_to.text = device.full_spec.target.listname
+        label_from.text = device.full_spec.source.list_name
+        label_to.text = device.full_spec.target.list_name
         toggle.isChecked = device.active
 
     }

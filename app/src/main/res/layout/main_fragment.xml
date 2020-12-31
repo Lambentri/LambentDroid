@@ -161,25 +161,25 @@
                         />
                 </LinearLayout>
 
-<!--                <com.google.android.material.tabs.TabLayout-->
-<!--                    android:id="@+id/tab_layout"-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="wrap_content" />-->
-
-<!--                <androidx.viewpager2.widget.ViewPager2-->
-<!--                    android:id="@+id/tab_pager"-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:layout_weight="1" />-->
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/device_recycler"
+                <com.google.android.material.tabs.TabLayout
+                    android:id="@+id/tab_layout"
                     android:layout_width="match_parent"
-                    android:layout_height="500dp"
-                    android:gravity="center"
-                    android:padding="8dp"
-                    tools:listitem="@layout/devices_item"
-                    items_devices="@{viewModel.list_devices_l_t}"
-                    />
+                    android:layout_height="wrap_content" />
+
+                <androidx.viewpager2.widget.ViewPager2
+                    android:id="@+id/tab_pager"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
+<!--                <androidx.recyclerview.widget.RecyclerView-->
+<!--                    android:id="@+id/device_recycler"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="500dp"-->
+<!--                    android:gravity="center"-->
+<!--                    android:padding="8dp"-->
+<!--                    tools:listitem="@layout/devices_item"-->
+<!--                    items_devices="@{viewModel.list_devices_l_t}"-->
+<!--                    />-->
             </LinearLayout>
 
 

@@ -22,7 +22,7 @@
             android:gravity="center"
             android:padding="8dp"
             tools:listitem="@layout/devices_item"
-            app:items_machines="@{viewModel.list_machines_rl}"
+            app:items_machines="@{viewModel.list_machined_l_t}"
             />
     </LinearLayout>
 </layout>
