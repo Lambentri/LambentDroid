@@ -21,7 +21,7 @@
             android:layout_marginStart="8dp"
             android:fontFamily="sans-serif-condensed"
             android:text="@{item.id}"
-            android:textSize="32sp"
+            android:textSize="28sp"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="@tools:sample/cities" />
@@ -31,8 +31,9 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:orientation="vertical"
-            app:layout_constraintRight_toLeftOf="@id/link_button_rename"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintRight_toLeftOf="@id/link_switch"
+            app:layout_constraintTop_toTopOf="parent"
+            android:paddingBottom="2dp">
 
             <TextView
                 android:id="@+id/link_from"
@@ -83,18 +84,18 @@
                 android:layout_gravity="center"/>
         </LinearLayout>
 
-        <ImageButton
-            android:id="@+id/link_button_rename"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_gravity="center_vertical"
-            android:layout_marginHorizontal="8dp"
-            android:layout_marginTop="8dp"
-            android:background="@drawable/ic_baseline_close_24"
-            android:scaleType="fitXY"
+<!--        <ImageButton-->
+<!--            android:id="@+id/link_button_delete"-->
+<!--            android:layout_width="32dp"-->
+<!--            android:layout_height="32dp"-->
+<!--            android:layout_gravity="center_vertical"-->
+<!--            android:layout_marginHorizontal="8dp"-->
+<!--            android:layout_marginTop="8dp"-->
+<!--            android:background="@drawable/ic_baseline_close_24"-->
+<!--            android:scaleType="fitXY"-->
 
-            app:layout_constraintRight_toLeftOf="@+id/link_switch"
-            app:layout_constraintTop_toTopOf="parent" />
+<!--            app:layout_constraintRight_toLeftOf="@+id/link_switch"-->
+<!--            app:layout_constraintTop_toTopOf="parent" />-->
 
         <Switch
             android:id="@+id/link_switch"

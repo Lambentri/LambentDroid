@@ -156,8 +156,8 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
     }
 
     fun link_listener(args: List<Any>, kwargs: Map<String, Any>, details: EventDetails) {
-        log { "Got Link Update" }
-        log { kwargs.toString() }
+//        log { "Got Link Update" }
+//        log { kwargs.toString() }
 //        log { details.toString() }
 
         val links = kwargs.get("links") as Map<String, Map<String, Any>>
@@ -166,8 +166,7 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
 //        for ((key: String, entry: Map<String, Any>) in links) {
 //            list_links[key] = Link.fromNetwork(entry)
 //        }
-        log { links.map{it.key to Link.fromNetwork(it.value)}.toMap().toMutableMap().toString() }
-        list_links = links.map{it.key to Link.fromNetwork(it.value)}.toMap().toMutableMap()
+        list_links = links.map { it.key to Link.fromNetwork(it.value) }.toMap().toMutableMap()
 //        list_sinks = sinks.map{it.key to LinkSink.fromNetwork(it.value)}.toMap().toMutableMap()
 //        for (entry in sinks) {
 //            val s = LinkSink.fromNetwork(entry)
@@ -178,9 +177,7 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
 //            val s = LinkSrc.fromNetwork(entry)
 //            list_srcs[s.id] = s
 //        }
-        log {"wew"}
-        list_links_l_t.value = list_links.values.toList()
-        log {"lad"}
+        list_links_l_t.value = list_links.values.toList().sortedBy { it.list_name }
         notifyChange()
 
     }
@@ -197,7 +194,7 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
             val d = Device.fromNetwork(entry)
             list_devices[d.id] = d
         }
-        list_devices_l_t.value = list_devices.values.toList()
+        list_devices_l_t.value = list_devices.values.toList().sortedBy { it.name }
 
 
         log { list_devices.toString() }
@@ -205,15 +202,17 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
 
     fun machine_collector(session: Session) {
         log { "Collecting Machines" }
-
-        session.call("com.lambentri.edge.la4.machine.list").thenAccept { it ->
-            log { "Collected" }
-            val machine_result = MachineQuery.fromNetwork(it.results.get(0) as Map<String, String>)
-            for (entry: Machine in machine_result.machines.values) {
-                list_machines[entry.id] = entry
+        if (session.isConnected()) {
+            session.call("com.lambentri.edge.la4.machine.list").thenAccept { it ->
+                log { "Collected" }
+                val machine_result =
+                    MachineQuery.fromNetwork(it.results.get(0) as Map<String, String>)
+                for (entry: Machine in machine_result.machines.values) {
+                    list_machines[entry.id] = entry
+                }
+                list_machined_l_t.value = list_machines.values.toList().sortedBy { it.name }
+                notifyChange()
             }
-            list_machined_l_t.value = list_machines.values.toList()
-            notifyChange()
         }
     }
 
@@ -371,6 +370,86 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
                 "com.lambentri.edge.la4.device.82667777.name",
                 call_map
             )
+        }
+    }
+
+    fun machine_faster(machine: Machine) {
+        log { "netMachFaster" }
+        if (session.isConnected()) {
+            session.call(
+                "com.lambentri.edge.la4.machine.tick_up",
+                machine.id
+            ).thenAccept {
+                val res = it.results.get(0) as Map<String, String>
+                log { res.toString() }
+                this.machine_collector(this.session)
+                this.machine_collector(this.session)
+            }
+        }
+    }
+
+    fun machine_slower(machine: Machine) {
+        log { "netMachSlower" }
+        if (session.isConnected()) {
+            session.call(
+                "com.lambentri.edge.la4.machine.tick_dn",
+                machine.id
+            ).thenAccept {
+                val res = it.results.get(0) as Map<String, String>
+                log { res.toString() }
+                this.machine_collector(this.session)
+                this.machine_collector(this.session)
+            }
+        }
+    }
+
+    fun machine_playpause(machine: Machine) {
+        log { "netMachSlower" }
+        if (session.isConnected()) {
+            session.call(
+                "com.lambentri.edge.la4.machine.pause",
+                machine.id
+            ).thenAccept {
+                log { it.results.get(0).toString() }
+                this.machine_collector(this.session)
+                this.machine_collector(this.session)
+            }
+        }
+    }
+
+    fun machine_mk() {
+
+    }
+
+    fun machine_rm() {
+
+    }
+
+    fun link_mk() {
+
+    }
+
+    fun link_mk_bulk() {
+
+    }
+
+    fun link_rm() {
+
+    }
+
+    fun link_rm_bulk() {
+
+    }
+
+    fun link_toggle(link: Link) {
+        log { "netLinkToggle" }
+        if (session.isConnected()) {
+            session.call(
+                "com.lambentri.edge.la4.links.toggle",
+                link.name
+            ).thenAccept {
+                log { it.results.get(0).toString() }
+            }
         }
     }
 

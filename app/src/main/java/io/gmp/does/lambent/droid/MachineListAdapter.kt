@@ -6,13 +6,14 @@ import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
+import io.gmp.does.lambent.droid.ui.main.MainViewModel
 
 
-
-class MachineListAdapter internal constructor() : RecyclerView.Adapter<MachineMainViewHolder>() {
+class MachineListAdapter internal constructor(viewModel: MainViewModel) : RecyclerView.Adapter<MachineMainViewHolder>() {
+    val viewModel = viewModel
     var items = emptyList<Machine>()
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MachineMainViewHolder {
-        return MachineMainViewHolder(LayoutInflater.from(parent.context), parent)
+        return MachineMainViewHolder(LayoutInflater.from(parent.context), parent, viewModel)
     }
 
     override fun onBindViewHolder(holder: MachineMainViewHolder, position: Int) {
@@ -30,7 +31,7 @@ class MachineListAdapter internal constructor() : RecyclerView.Adapter<MachineMa
     }
 }
 
-class MachineMainViewHolder internal constructor(inflater: LayoutInflater, parent: ViewGroup) :
+class MachineMainViewHolder internal constructor(inflater: LayoutInflater, parent: ViewGroup, viewModel: MainViewModel) :
     RecyclerView.ViewHolder(inflater.inflate(R.layout.machines_item, parent, false)) {
 
     lateinit var item: Machine
@@ -51,12 +52,15 @@ class MachineMainViewHolder internal constructor(inflater: LayoutInflater, paren
 
         button_plus.setOnClickListener {
             Toast.makeText(parent.context, "Faster Clicked", Toast.LENGTH_SHORT).show()
+            viewModel.machine_faster(item)
         }
         button_minus.setOnClickListener {
             Toast.makeText(parent.context, "Slower Clicked", Toast.LENGTH_SHORT).show()
+            viewModel.machine_slower(item)
         }
         button_playpause.setOnClickListener {
             Toast.makeText(parent.context, "Play/Pause Clicked", Toast.LENGTH_SHORT).show()
+            viewModel.machine_playpause(item)
         }
     }
 

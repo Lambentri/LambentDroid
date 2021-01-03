@@ -10,6 +10,8 @@
     <string name="connection_port">Port</string>
     <string name="connection_realm">Realm</string>
 
+    <string name="fab_link_new">New Link</string>
+    <string name="fab_machine_new">New Machine</string>
 
 
     <string name="label_brightness">Brightness</string>

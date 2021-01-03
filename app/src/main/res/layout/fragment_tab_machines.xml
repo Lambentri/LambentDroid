@@ -10,19 +10,30 @@
             type="io.gmp.does.lambent.droid.ui.main.MainViewModel" />
     </data>
 
-    <LinearLayout
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_machine_new"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start|bottom"
+            android:layout_margin="16dp"
+            android:contentDescription="@string/fab_machine_new"
+            android:text="@string/fab_machine_new"
+            android:src="@drawable/ic_baseline_add_24"
+            />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/machine_recycler"
             android:layout_width="match_parent"
-            android:layout_height="500dp"
+            android:layout_height="match_parent"
             android:gravity="center"
             android:padding="8dp"
             tools:listitem="@layout/devices_item"
             app:items_machines="@{viewModel.list_machined_l_t}"
             />
-    </LinearLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

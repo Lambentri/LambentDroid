@@ -24,8 +24,8 @@ val Labels = listOf<String>(
     "Devices",
     "Machs",
     "Links",
-    "Zones",
-    "Sets"
+    "Zones"
+//    "Sets"
 )
 
 private const val ARG_ID = "id"
@@ -90,7 +90,7 @@ class MainFragment : Fragment() {
 
         // to update the machines
         val handler = Handler()
-        val delay = 10000L // 10000 milliseconds == 10 second
+        val delay = 4000L // 4000 milliseconds == 4 second
         handler.postDelayed(object : Runnable {
             override fun run() {
                 println("myHandler: here!") // Do your work here
@@ -169,7 +169,7 @@ class MachineListFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val device_list_adapter = MachineListAdapter()
+        val device_list_adapter = MachineListAdapter(viewModel)
         device_list_adapter.setMachines(viewModel.list_machined_l_t.value!!)
         machine_recycler.layoutManager = LinearLayoutManager(context)
         machine_recycler.adapter = device_list_adapter
@@ -193,7 +193,7 @@ class LinkListFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val device_list_adapter = LinkListAdapter()
+        val device_list_adapter = LinkListAdapter(viewModel)
         device_list_adapter.setLinks(viewModel.list_links.values.toList())
         link_recycler.layoutManager = LinearLayoutManager(context)
         link_recycler.adapter = device_list_adapter
