@@ -12,16 +12,14 @@ class DeviceRenameDialog : DialogFragment() {
         return activity?.let {
             // Use the Builder class for convenient dialog construction
             val builder = AlertDialog.Builder(it)
-            builder.setMessage(R.string.device_rename)
+            builder.setMessage(R.string.dialog_title_device_rename)
                 .setPositiveButton(
                     R.string.app_submit,
                     DialogInterface.OnClickListener { dialog, id ->
-                        // FIRE ZE MISSILES!
                     })
                 .setNegativeButton(
                     R.string.app_cancel,
                     DialogInterface.OnClickListener { dialog, id ->
-                        // User cancelled the dialog
                     })
             // Create the AlertDialog object and return it
             builder.create()

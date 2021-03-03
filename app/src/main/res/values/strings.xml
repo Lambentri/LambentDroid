@@ -5,19 +5,32 @@
 
     <string name="app_submit">Submit</string>
     <string name="app_cancel">Cancel</string>
+    <string name="app_okay">OK</string>
 
     <string name="connection_host">Host</string>
     <string name="connection_port">Port</string>
     <string name="connection_realm">Realm</string>
 
+    <string name="fab_device_rescan">Rescan Devices</string>
     <string name="fab_link_new">New Link</string>
     <string name="fab_machine_new">New Machine</string>
+
+    <string name="fab_label_link_add">Add</string>
+    <string name="fab_label_link_add_bulk">Bulk</string>
+    <string name="fab_label_link_nuke">Clear all</string>
 
 
     <string name="label_brightness">Brightness</string>
 
-    <string name="device_rename">Rename Device @</string>
-    <string name="dialog_rename_hint">Desk</string>
+    <string name="dialog_title_device_rename">Rename Device @</string>
+    <string name="dialog_title_link_add">New Link</string>
+    <string name="dialog_title_link_add_bulk">New Bulk Link</string>
+    <string name="dialog_title_link_nuke">Clear all links?</string>
+    <string name="dialog_title_link_nuke_detail">This cannot be undone.</string>
+
+    <string name="dialog_device_rename_hint">Desk</string>
+
+
     <string name="device_button_desc_flash">Flash this device to locate it</string>
     <string name="device_button_desc_rename">Change the given name of this device</string>
 </resources>

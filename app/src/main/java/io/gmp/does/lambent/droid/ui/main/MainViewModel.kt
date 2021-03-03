@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import android.view.View
 import android.widget.AdapterView
+import android.widget.EditText
 import androidx.databinding.*
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
@@ -74,8 +75,8 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
     var brightnessSelectedPosition: Int = 0
 
     var list_links: MutableMap<String, Link> = ObservableArrayMap<String, Link>()
-    var list_srcs: MutableMap<String, LinkSrc> = ObservableArrayMap<String, LinkSrc>()
-    var list_sinks: MutableMap<String, LinkSink> = ObservableArrayMap<String, LinkSink>()
+    var list_srcs: MutableList<LinkSrc> = ObservableArrayList<LinkSrc>()
+    var list_sinks: MutableList<LinkSink> = ObservableArrayList<LinkSink>()
     var list_machines: MutableMap<String, Machine> = ObservableArrayMap<String, Machine>()
     var list_devices: MutableMap<String, Device> = ObservableArrayMap<String, Device>()
 
@@ -167,7 +168,8 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
 //            list_links[key] = Link.fromNetwork(entry)
 //        }
         list_links = links.map { it.key to Link.fromNetwork(it.value) }.toMap().toMutableMap()
-//        list_sinks = sinks.map{it.key to LinkSink.fromNetwork(it.value)}.toMap().toMutableMap()
+        list_sinks = sinks.map { LinkSink.fromNetwork(it) }.toMutableList()
+        list_srcs = srcs.map { LinkSrc.fromNetwork(it) }.toMutableList()
 //        for (entry in sinks) {
 //            val s = LinkSink.fromNetwork(entry)
 //            list_sinks[s.id] = s
@@ -359,6 +361,16 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
         }
     }
 
+    fun device_poke_subtle(entryId: String) {
+        log { "netPOKER S" }
+        if (session.isConnected()) {
+            session.call(
+                "com.lambentri.edge.la4.device.82667777.pokes",
+                entryId
+            )
+        }
+    }
+
     fun device_rename(entryIname: String, newName: String) {
         log { "netRENAMER" }
         if (session.isConnected()) {
@@ -369,6 +381,15 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
             session.call(
                 "com.lambentri.edge.la4.device.82667777.name",
                 call_map
+            )
+        }
+    }
+
+    fun device_rescan() {
+        log { "devicePunisher" }
+        if (session.isConnected()) {
+            session.call(
+                "com.lambentri.edge.la4.device.82667777.rescan"
             )
         }
     }
@@ -425,12 +446,44 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
 
     }
 
-    fun link_mk() {
+    fun link_mk(src : LinkSrc, tgt: LinkSink, name: String) {
+        val payload = mapOf(
+            "link_name" to name,
+            "link_spec" to mapOf(
+                "source" to src.toNetwork(),
+                "target" to tgt.toNetwork()
+            )
+        )
 
+        if (session.isConnected()) {
+            session.call(
+                "com.lambentri.edge.la4.links.save",
+                payload
+            ).thenAccept {
+                log { "mkmkmkmk"}
+                log { it.results.get(0).toString() }
+            }
+        }
     }
 
-    fun link_mk_bulk() {
 
+    fun link_mk_bulk(src : LinkSrc, tgt: List<LinkSink>, name: String) {
+        val payload = mapOf(
+            "link_name" to name,
+            "link_spec" to mapOf(
+                "source" to src.toNetwork(),
+                "targets" to tgt.map{it.toNetwork()}
+            )
+        )
+        if (session.isConnected()) {
+            session.call(
+                "com.lambentri.edge.la4.links.save_bulk",
+                payload
+            ).thenAccept {
+                log { "mkmkmkmk"}
+                log { it.results.get(0).toString() }
+            }
+        }
     }
 
     fun link_rm() {
@@ -438,7 +491,14 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
     }
 
     fun link_rm_bulk() {
-
+        log { "bulkClear" }
+        if (session.isConnected()) {
+            session.call(
+                "com.lambentri.edge.la4.links.destroy_all"
+            ).thenAccept {
+                log { it.results.get(0).toString() }
+            }
+        }
     }
 
     fun link_toggle(link: Link) {
@@ -449,6 +509,20 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
                 link.name
             ).thenAccept {
                 log { it.results.get(0).toString() }
+            }
+        }
+    }
+
+    fun query_and_set_names(editText: EditText) {
+        var result = "a"
+        if (session.isConnected()) {
+            session.call(
+                "com.lambentri.edge.la4.helpers.namegen"
+            ).thenAccept {
+                log { it.results.get(0).toString() }
+                val netresult = it.results.get(0) as Map<String, String>
+                result = netresult.getOrDefault("name", "")
+                editText.setText(result)
             }
         }
     }
@@ -483,5 +557,4 @@ open class MainViewModel(application: Application) : AndroidViewModel(applicatio
         connectOptions.reconnectInterval = 5000
 
     }
-
 }

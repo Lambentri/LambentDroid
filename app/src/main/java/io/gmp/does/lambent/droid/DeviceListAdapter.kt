@@ -61,11 +61,18 @@ class DeviceMainViewHolder internal constructor(
         label_name = itemView.findViewById(R.id.device_name)
         button_flash = itemView.findViewById(R.id.device_button_flash)
         button_rename = itemView.findViewById(R.id.device_button_rename)
-
+        
+        button_flash.setOnLongClickListener {
+            Toast.makeText(parent.context, "Flash Clicked (Subtle)", Toast.LENGTH_SHORT).show()
+            viewModel.device_poke_subtle(item.iname)
+            return@setOnLongClickListener false
+        }
         button_flash.setOnClickListener {
             Toast.makeText(parent.context, "Flash Clicked", Toast.LENGTH_SHORT).show()
             viewModel.device_poke(item.iname)
         }
+
+
 
         button_rename.setOnClickListener {
             val activity: MainActivity = parent.context as MainActivity

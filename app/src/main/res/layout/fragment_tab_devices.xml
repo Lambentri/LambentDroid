@@ -8,10 +8,20 @@
             type="io.gmp.does.lambent.droid.ui.main.MainViewModel" />
     </data>
 
-    <LinearLayout
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_device_rescan"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start|bottom"
+            android:layout_margin="16dp"
+            android:contentDescription="@string/fab_device_rescan"
+            android:text="@string/fab_device_rescan"
+            android:src="@drawable/ic_baseline_flash_on_24" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/device_recycler"
@@ -22,5 +32,5 @@
             tools:listitem="@layout/devices_item"
             items_devices="@{viewModel.list_devices_l_t}"
             />
-    </LinearLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

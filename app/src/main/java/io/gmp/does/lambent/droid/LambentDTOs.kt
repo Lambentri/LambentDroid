@@ -146,7 +146,7 @@ data class Link(
 }
 
 
-class LinkSrc(
+data class LinkSrc(
     val list_name: String,
     val ttl: String,
     val id: String,
@@ -161,11 +161,13 @@ class LinkSrc(
 
             val data = LinkSrc(list_name, ttl, id, cls)
         }.data
+
     }
+    fun toNetwork(): Map<String, String> = mapOf("list_name" to list_name, "ttl" to ttl, "id" to id, "cls" to cls)
 }
 
 
-class LinkSink(
+data class LinkSink(
     val list_name: String,
     val grp: String,
     val iname: String,
@@ -183,4 +185,5 @@ class LinkSink(
             val data = LinkSink(list_name, grp, iname, id, name)
         }.data
     }
+    fun toNetwork(): Map<String, String> = mapOf("list_name" to list_name, "grp" to grp, "id" to id, "iname" to iname, "name" to name)
 }

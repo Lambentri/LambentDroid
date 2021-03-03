@@ -7,11 +7,8 @@ import android.util.Log
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.lifecycle.ViewModelProviders
-import io.gmp.does.lambent.droid.ui.main.DeviceRenameDialog
 import io.gmp.does.lambent.droid.ui.main.MainFragment
 import io.gmp.does.lambent.droid.ui.main.MainViewModel
-import kotlin.concurrent.fixedRateTimer
 
 inline fun log(lambda: () -> String) {
     if (BuildConfig.DEBUG) {
@@ -35,9 +32,9 @@ class MainActivity : AppCompatActivity() {
         Toast.makeText(this, "Rename Clicked", Toast.LENGTH_SHORT).show()
         val builder: AlertDialog.Builder = AlertDialog.Builder(this)
         val inflater = this.layoutInflater
-        val dialogView = inflater.inflate(R.layout.dialog_rename, null)
+        val dialogView = inflater.inflate(R.layout.dialog_device_rename, null)
         builder.setMessage(device.iname)
-            .setTitle(R.string.device_rename)
+            .setTitle(R.string.dialog_title_device_rename)
         builder.apply {
             setView(dialogView)
             setPositiveButton(R.string.app_submit,

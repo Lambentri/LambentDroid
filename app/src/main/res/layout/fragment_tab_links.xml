@@ -15,15 +15,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab_link_new"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="start|bottom"
-            android:layout_margin="16dp"
-            android:contentDescription="@string/fab_link_new"
-            android:text="@string/fab_link_new"
-            android:src="@drawable/ic_baseline_add_24" />
+
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/link_recycler"
@@ -33,6 +25,8 @@
             android:padding="8dp"
             app:items_links="@{viewModel.list_links_l_t}"
             tools:listitem="@layout/links_item" />
+
+        <include layout="@layout/link_fab_submenu"/>
 
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -51,7 +51,7 @@ class LinkMainViewHolder internal constructor(
     var toggling: Boolean = false
 
     init {
-        label_name = itemView.findViewById(R.id.link_name)
+        label_name = itemView.findViewById(R.id.link_name_textbox)
         label_from = itemView.findViewById(R.id.link_from)
         label_to = itemView.findViewById(R.id.link_to)
 //        button_rm = itemView.findViewById(R.id.link_button_delete)
